@@ -1,0 +1,71 @@
+from keras.models import Sequential
+from keras.layers import Convolution2D
+from keras.layers import MaxPooling2D
+from keras.layers import Flatten
+from keras.layers import Dense
+import matplotlib.pyplot as plt
+import numpy as np
+
+model = Sequential()
+
+#Convolution layers
+model.add(Convolution2D(32, 3, 3, input_shape = (64, 64, 3), activation = 'relu'))
+model.add(MaxPooling2D(pool_size = (2, 2)))
+
+model.add(Convolution2D(32, 3, 3, activation = 'relu'))
+model.add(MaxPooling2D(pool_size = (2, 2)))
+
+model.add(Convolution2D(64, 3, 3, activation = 'relu'))
+model.add(MaxPooling2D(pool_size = (2, 2)))
+
+
+# Step 3 - Flattening
+model.add(Flatten())
+
+# Step 4 - Full connection
+model.add(Dense(output_dim = 128, activation = 'relu'))
+model.add(Dense(output_dim = 128, activation = 'relu'))
+model.add(Dense(output_dim = 128, activation = 'relu'))
+model.add(Dense(output_dim = 1, activation = 'sigmoid'))
+
+# Compiling the CNN
+model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+
+from keras.preprocessing.image import ImageDataGenerator
+
+
+train_datagen = ImageDataGenerator(rescale = 1./255,
+                                   shear_range = 0.2,
+                                   zoom_range = 0.2,
+                                   horizontal_flip = True)
+
+test_datagen = ImageDataGenerator(rescale = 1./255)
+
+training_set = train_datagen.flow_from_directory('/home/pooja/Mini-project/train',
+                                                 target_size = (64, 64),
+                                                 batch_size = 10,
+                                                 class_mode = 'binary')
+
+test_set = test_datagen.flow_from_directory('/home/pooja/Mini-project/test',
+                                            target_size = (64, 64),
+                                            batch_size = 10,
+                                            class_mode = 'binary')
+
+
+#Loss Curves
+plt.figure(figsize=[8,6])
+plt.plot(history.history['loss'],'r',linewidth=2.0)
+plt.plot(history.history['val_loss'],'b',linewidth=2.0)
+plt.legend(['Training loss', 'Validation Loss'],fontsize=18)
+plt.xlabel('Epochs ',fontsize=16)
+plt.ylabel('Loss',fontsize=16)
+plt.title('Loss Curves',fontsize=16)
+ 
+# Accuracy Curves
+plt.figure(figsize=[8,6])
+plt.plot(history.history['acc'],'r',linewidth=2.0)
+plt.plot(history.history['val_acc'],'b',linewidth=2.0)
+plt.legend(['Training Accuracy', 'Validation Accuracy'],fontsize=18)
+plt.xlabel('Epochs ',fontsize=16)
+plt.ylabel('Accuracy',fontsize=16)
+plt.title('Accuracy Curves',fontsize=16)
